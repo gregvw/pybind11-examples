@@ -40,21 +40,28 @@ private:
 
 }; // class Vector
 
-
-PYBIND11_MODULE(vector,m) {
-  py::class_<Vector<double>>(m,"Vector")
+template<typename T>
+py::class_<Vector<T>> pybind_class_Vector( py::module& m, const char* name ) {
+  return 
+  py::class_<Vector<T>>(m,name)
   .def(py::init<int>())
-  .def("size",&Vector<double>::size,"Number of elements")
+  .def("size",&Vector<T>::size,"Number of elements")
   .def("__setitem__", 
-       [](Vector<double>& v, int index, double value) {
+       [](Vector<T>& v, int index, T value) {
          if(index>v.size()) throw py::index_error();
          else v[index] = value;
        })
-  .def("__getitem__",[](Vector<double>& v, int index) {
+  .def("__getitem__",[](Vector<T>& v, int index) {
     if(index>v.size()) throw py::index_error();
     else return v[index];
   })
-  .def("__str__",&Vector<double>::to_string)
-  .def("__repr__",&Vector<double>::to_string)
+  .def("__str__",&Vector<T>::to_string)
+  .def("__repr__",&Vector<T>::to_string)
   .def(py::self + py::self);
+}
+
+
+PYBIND11_MODULE(vector,m) {
+  pybind_class_Vector<float>(m,"FloatVector");
+  pybind_class_Vector<double>(m,"DoubleVector");
 }
